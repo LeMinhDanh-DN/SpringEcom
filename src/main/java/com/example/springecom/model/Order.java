@@ -25,7 +25,12 @@ public class Order {
     private String status;
     private LocalDate orderDate;
 
+    @ManyToOne
+    private User user;
+
+
     //cascade
+    //khi cap nhat order thi toan bo item cung cap nhat
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     List<OrderItem> items;
 }
