@@ -4,12 +4,15 @@ import com.example.springecom.exception.ProductNotFoundException;
 import com.example.springecom.model.Order;
 import com.example.springecom.model.OrderItem;
 import com.example.springecom.model.Product;
+import com.example.springecom.model.User;
 import com.example.springecom.model.dto.OrderItemResponse;
 import com.example.springecom.model.dto.OrderRequest;
 import com.example.springecom.model.dto.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
+import com.example.springecom.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,9 +28,13 @@ public class OrderService {
     OrderRepo orderRepo;
     @Autowired
     ProductRepo productRepo;
+    @Autowired
+    UserRepo userRepo;
 
-    public OrderResponse placeOrder(OrderRequest request){
+    public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails){
 
+        String userName = userDetails.getUsername();
+        User user = userRepo.findByUsername(userName);
         //Creating order obj for repostory
         Order order = new Order();
         String orderId = "ORD" + UUID.randomUUID().toString().substring(0,8).toUpperCase();
@@ -61,8 +68,13 @@ public class OrderService {
         });
 
         order.setItems(orderItems);
+        //adding order to list of order of current user
+        List<Order> cur_order = user.getOrders();
+        cur_order.add(order);
+        user.setOrders(cur_order);
         //already cascade at order so orderItem will be automatically saved
         Order savedOrder = orderRepo.save(order);
+        User savedUser = userRepo.save(user);
 
 
         //Creating orderResponse for Responsing to client
