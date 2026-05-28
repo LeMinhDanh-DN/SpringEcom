@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.example.springecom.exception.UserNotFoundException;
+
 @Entity
 @Data
 @Table(name = "users")
@@ -26,4 +28,9 @@ public class User {
     private List<Order> orders;
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     // private List<Product> products;
+
+    public User orElseThrow(UserNotFoundException userNotFoundException) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 }
