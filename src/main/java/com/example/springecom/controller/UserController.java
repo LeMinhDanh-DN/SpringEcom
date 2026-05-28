@@ -9,10 +9,14 @@ import com.example.springecom.service.JwtService;
 import com.example.springecom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -57,5 +61,23 @@ public class UserController {
         }
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("me")
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+
+        if (userDetails == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        User user = userService.findByUserName(userDetails.getUsername());
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                null);
+        return ResponseEntity.ok(userResponse);
     }
 }
