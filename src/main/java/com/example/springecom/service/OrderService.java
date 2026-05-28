@@ -31,13 +31,13 @@ public class OrderService {
     @Autowired
     UserRepo userRepo;
 
-    public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails){
+    public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
 
         String userName = userDetails.getUsername();
         User user = userRepo.findByUsername(userName);
-        //Creating order obj for repostory
+        // Creating order obj for repostory
         Order order = new Order();
-        String orderId = "ORD" + UUID.randomUUID().toString().substring(0,8).toUpperCase();
+        String orderId = "ORD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         order.setOrderId(orderId);
         order.setCustomerName(request.customerName());
@@ -58,8 +58,7 @@ public class OrderService {
                     .quantity(i.quantity())
                     .totalPrice(
                             product.getPrice()
-                                    .multiply(BigDecimal.valueOf(i.quantity()))
-                    )
+                                    .multiply(BigDecimal.valueOf(i.quantity())))
                     .order(order)
                     .build();
 
@@ -68,17 +67,17 @@ public class OrderService {
         });
 
         order.setItems(orderItems);
-        //adding order to list of order of current user
+        // adding order to list of order of current user
         List<Order> cur_order = user.getOrders();
         cur_order.add(order);
         user.setOrders(cur_order);
-        //already cascade at order so orderItem will be automatically saved
+        // already cascade at order so orderItem will be automatically saved
         Order savedOrder = orderRepo.save(order);
-        User savedUser = userRepo.save(user);
 
+        userRepo.save(user);
 
-        //Creating orderResponse for Responsing to client
-        List<OrderItemResponse> orderItemResponse= new ArrayList<>();
+        // Creating orderResponse for Responsing to client
+        List<OrderItemResponse> orderItemResponse = new ArrayList<>();
         savedOrder.getItems().forEach(orderItem -> {
             OrderItemResponse orderResponse = OrderItemResponse.builder()
                     .productName(orderItem.getProduct().getName())
@@ -98,14 +97,17 @@ public class OrderService {
         return orderResponse;
     }
 
-    public List<OrderResponse> getAllOrderResponses(){
-        List<Order> orders = orderRepo.findAll();
+    public List<OrderResponse> getAllOrderResponses(UserDetails userDetails) {
+        String userName = userDetails.getUsername();
+
+        List<Order> orders = orderRepo.findByCustomerName(userName);
         List<OrderResponse> orderResponses = new ArrayList<>();
 
         for (Order order : orders) {
             List<OrderItemResponse> orderItemResponses = new ArrayList<>();
 
-            order.getItems().forEach(orderItem -> {;
+            order.getItems().forEach(orderItem -> {
+                ;
                 OrderItemResponse orderItemResponse = OrderItemResponse.builder()
                         .productName(orderItem.getProduct().getName())
                         .quantity(orderItem.getQuantity())
@@ -120,13 +122,10 @@ public class OrderService {
                     order.getEmail(),
                     order.getStatus(),
                     order.getOrderDate(),
-                    orderItemResponses
-            );
+                    orderItemResponses);
             orderResponses.add(orderResponse);
         }
         return orderResponses;
     }
-
-
 
 }

@@ -14,7 +14,7 @@ public class UserService {
     @Autowired
     PasswordEncoder encoder;
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
     }
