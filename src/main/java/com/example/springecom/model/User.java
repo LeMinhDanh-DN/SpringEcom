@@ -16,11 +16,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false, unique = true)
     private String username;
     private String password;
+    private String email;
+    private String name;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Product> products;
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    // private List<Product> products;
 }
