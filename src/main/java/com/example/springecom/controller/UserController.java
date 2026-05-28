@@ -3,6 +3,7 @@ package com.example.springecom.controller;
 import com.example.springecom.model.User;
 import com.example.springecom.model.dto.AuthRequest;
 import com.example.springecom.model.dto.AuthResponse;
+import com.example.springecom.model.dto.RegisterRequest;
 import com.example.springecom.model.dto.UserResponse;
 import com.example.springecom.service.JwtService;
 import com.example.springecom.service.UserService;
@@ -26,8 +27,15 @@ public class UserController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.saveUser(user));
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        User savedUser = userService.registerUser(request);
+        String token = jwtService.generateToken(savedUser.getUsername());
+        UserResponse userResponse = new UserResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getName());
+        return new ResponseEntity<>(new AuthResponse(token, userResponse), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
