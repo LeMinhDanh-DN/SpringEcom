@@ -17,7 +17,7 @@ import com.example.springecom.exception.UserNotFoundException;
 public class User {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @Column(nullable = false, unique = true)
     private String username;
     private String password;
@@ -29,8 +29,4 @@ public class User {
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     // private List<Product> products;
 
-    public User orElseThrow(UserNotFoundException userNotFoundException) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
-    }
 }
