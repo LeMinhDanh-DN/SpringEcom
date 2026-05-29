@@ -54,9 +54,10 @@ public class UserController {
 
             UserResponse userResponse = new UserResponse(
                     user.getId(),
+                    user.getUsername(),
                     user.getEmail(),
-                    user.getName(),
-                    token);
+                    user.getName()
+                    );
 
             return ResponseEntity.ok(new AuthResponse(token, userResponse));
         }

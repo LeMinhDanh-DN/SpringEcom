@@ -31,12 +31,12 @@ public class OrderService {
     @Autowired
     ProductRepo productRepo;
     @Autowired
-    UserRepo userRepo;
+    UserService userService;
 
     public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
 
         String userName = userDetails.getUsername();
-        User user = userRepo.findByUsername(userName).orElseThrow(() -> new UserNotFoundException("cant find user with username " + userName));
+        User user = userService.findByUserName(userName);
         // Creating order obj for repostory
         Order order = new Order();
         String orderId = "ORD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -74,9 +74,10 @@ public class OrderService {
         cur_order.add(order);
         user.setOrders(cur_order);
         // already cascade at order so orderItem will be automatically saved
+        order.setUser(user);
+        // saving order and user
         Order savedOrder = orderRepo.save(order);
-
-        userRepo.save(user);
+        userService.saveUser(user);
 
         // Creating orderResponse for Responsing to client
         List<OrderItemResponse> orderItemResponse = new ArrayList<>();
@@ -101,8 +102,9 @@ public class OrderService {
 
     public List<OrderResponse> getAllOrderResponses(UserDetails userDetails) {
         String userName = userDetails.getUsername();
+        User user = userService.findByUserName(userName);
+        List<Order> orders = orderRepo.findByUser(user);
 
-        List<Order> orders = orderRepo.findByCustomerName(userName);
         List<OrderResponse> orderResponses = new ArrayList<>();
 
         for (Order order : orders) {
