@@ -1,6 +1,7 @@
 package com.example.springecom.service;
 
 import com.example.springecom.exception.ProductNotFoundException;
+import com.example.springecom.exception.UserNotFoundException;
 import com.example.springecom.model.Order;
 import com.example.springecom.model.OrderItem;
 import com.example.springecom.model.Product;
@@ -11,6 +12,7 @@ import com.example.springecom.model.dto.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
 import com.example.springecom.repo.UserRepo;
+import org.hibernate.service.UnknownServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class OrderService {
     public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
 
         String userName = userDetails.getUsername();
-        User user = userRepo.findByUsername(userName);
+        User user = userRepo.findByUsername(userName).orElseThrow(() -> new UserNotFoundException("cant find user with username " + userName));
         // Creating order obj for repostory
         Order order = new Order();
         String orderId = "ORD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
