@@ -32,6 +32,8 @@ public class OrderService {
     ProductRepo productRepo;
     @Autowired
     UserService userService;
+    @Autowired
+    private UserRepo userRepo;
 
     public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
 
@@ -70,16 +72,17 @@ public class OrderService {
 
         order.setItems(orderItems);
         // adding order to list of order of current user
-        List<Order> cur_order = user.getOrders();
-        cur_order.add(order);
-        user.setOrders(cur_order);
+
+//        List<Order> cur_order = user.getOrders();
+//        cur_order.add(order);
+//        user.setOrders(cur_order);
+
         // already cascade at order so orderItem will be automatically saved
         order.setUser(user);
-        // saving order and user
+        // saving order
         Order savedOrder = orderRepo.save(order);
-        userService.saveUser(user);
+//        userRepo.save(user);
 
-        // Creating orderResponse for Responsing to client
         List<OrderItemResponse> orderItemResponse = new ArrayList<>();
         savedOrder.getItems().forEach(orderItem -> {
             OrderItemResponse orderResponse = OrderItemResponse.builder()
