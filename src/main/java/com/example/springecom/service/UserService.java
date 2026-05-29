@@ -22,7 +22,8 @@ public class UserService {
     }
 
     public User findByUserName(String userName) {
-        return repo.findByUsername(userName).orElseThrow(new UserNotFoundException("cant find user"));
+        return repo.findByUsername(userName)
+                .orElseThrow(() -> new UserNotFoundException("Can't find user with username: " + userName));
     }
 
     public User registerUser(RegisterRequest request) {
