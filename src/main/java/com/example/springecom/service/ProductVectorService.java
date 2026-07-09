@@ -1,0 +1,44 @@
+package com.example.springecom.service;
+
+import com.example.springecom.mapper.ProductAiMapper;
+import com.example.springecom.model.Product;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+
+@Service
+public class ProductVectorService {
+
+    private final VectorStore vectorStore;
+    private final ProductAiMapper mapper;
+    private final ProductService productService;
+
+    public ProductVectorService(VectorStore vectorStore, ProductAiMapper mapper, ProductService productService) {
+        this.vectorStore = vectorStore;
+        this.mapper = mapper;
+        this.productService = productService;
+    }
+
+    public void insertProductToVectorStore(){
+        List<Product> products = productService.getAllProducts();
+
+        List<Document> documents = products.stream()
+                .map(product -> mapper.toAiDocument(product))
+                .toList();
+
+        vectorStore.add(documents);
+    }
+
+    public List<Document> searchSimilarProducts(String query, int topK){
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query(query)
+                .topK(topK)
+                .build();
+
+        return vectorStore.similaritySearch(searchRequest);
+    }
+}
