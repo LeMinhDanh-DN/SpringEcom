@@ -1,11 +1,10 @@
 package com.example.springecom.controller;
 
-import com.example.springecom.config.AiToolConfig; // Nhớ import class này
+import com.example.springecom.config.AiSearchTool; // Nhớ import class này
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +17,16 @@ import java.util.Map;
 public class ChatController {
 
     private final ChatClient chatClient;
-    private final AiToolConfig aiToolConfig;
+    private final AiSearchTool aiSearchTool;
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
-    public ChatController(ChatClient.Builder builder, AiToolConfig aiToolConfig) {
+    public ChatController(ChatClient.Builder builder, AiSearchTool aiSearchTool) {
         this.chatClient = builder
                 .defaultAdvisors(MessageChatMemoryAdvisor
                         .builder(chatMemory)
                         .build())
                 .build();
-        this.aiToolConfig = aiToolConfig;
+        this.aiSearchTool = aiSearchTool;
     }
 
     @GetMapping("/ask")
@@ -41,7 +40,7 @@ public class ChatController {
                             + "Use the 'searchProduct' tool to lookup product information in the database. "
                             + "Always return product name, price, brand, and stock details when making suggestions. "
                             + "Be friendly, polite, and helpful.")
-                    .tools(aiToolConfig)
+                    .tools(aiSearchTool)
                     .call()
                     .content();
         } catch (Exception e) {

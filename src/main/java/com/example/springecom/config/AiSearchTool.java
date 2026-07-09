@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Component
-public class AiToolConfig {
+public class AiSearchTool {
 
     private final ProductService service;
 
-    public AiToolConfig(ProductService service) {
+    public AiSearchTool(ProductService service) {
         this.service = service;
     }
 
