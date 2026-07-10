@@ -3,6 +3,7 @@ package com.example.springecom.service;
 import com.example.springecom.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.springecom.repo.ProductRepo;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.springecom.exception.ProductNotFoundException;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
+@Transactional
 public class ProductService {
 
     private ProductRepo repo;

@@ -33,6 +33,14 @@ public class ProductVectorService {
         vectorStore.add(documents);
     }
 
+    public void insertSingleProductToVectorStore(Product product) {
+        Document document = mapper.toAiDocument(product);
+
+        vectorStore.accept(List.of(document));
+
+        System.out.println("Đã đồng bộ sản phẩm ID: " + product.getId() + " vào PgVector");
+    }
+
     public List<Document> searchSimilarProducts(String query, int topK){
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(query)
