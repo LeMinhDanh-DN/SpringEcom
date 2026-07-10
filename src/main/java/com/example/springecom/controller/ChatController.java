@@ -1,6 +1,7 @@
 package com.example.springecom.controller;
 
 import com.example.springecom.config.AiSearchTool; // Nhớ import class này
+import com.example.springecom.model.Product;
 import com.example.springecom.service.ProductService;
 import com.example.springecom.service.ProductVectorService;
 import org.springframework.ai.chat.client.ChatClient;
@@ -115,7 +116,8 @@ public class ChatController {
     @PostMapping("/ingest-all")
     public String ingestAll() {
         try {
-            productVectorService.insertProductToVectorStore();
+            List<Product> products = productService.getAllProducts();
+            productVectorService.insertProductToVectorStore(products);
             return "Đã đồng bộ toàn bộ sản phẩm có sẵn sang Vector Database!";
         } catch (Exception e) {
             return "Lỗi: " + e.getMessage();

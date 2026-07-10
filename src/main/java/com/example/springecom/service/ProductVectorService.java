@@ -15,16 +15,14 @@ public class ProductVectorService {
 
     private final VectorStore vectorStore;
     private final ProductAiMapper mapper;
-    private final ProductService productService;
 
-    public ProductVectorService(VectorStore vectorStore, ProductAiMapper mapper, ProductService productService) {
+
+    public ProductVectorService(VectorStore vectorStore, ProductAiMapper mapper) {
         this.vectorStore = vectorStore;
         this.mapper = mapper;
-        this.productService = productService;
     }
 
-    public void insertProductToVectorStore(){
-        List<Product> products = productService.getAllProducts();
+    public void insertProductToVectorStore(List<Product> products){
 
         List<Document> documents = products.stream()
                 .map(product -> mapper.toAiDocument(product))

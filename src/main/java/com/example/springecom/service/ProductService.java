@@ -14,7 +14,13 @@ import java.util.List;
 @Transactional
 public class ProductService {
 
-    private ProductRepo repo;
+    private final ProductRepo repo;
+    private final ProductVectorService productVectorService;
+
+    public ProductService(ProductRepo repo, ProductVectorService service){
+        this.repo = repo;
+        this.productVectorService = service;
+    }
 
     public List<Product> getAllProducts() {
         return repo.findAll();
@@ -24,7 +30,12 @@ public class ProductService {
         p.setImageName(image.getOriginalFilename());
         p.setImageType(image.getContentType());
         p.setImageData(image.getBytes());
-        return repo.save(p);
+
+        Product savedProduct = repo.save(p);
+
+        productVectorService.insertSingleProductToVectorStore(savedProduct);
+
+        return savedProduct;
     }
 
     public Product getProductById(int id) {
@@ -61,8 +72,5 @@ public class ProductService {
         return repo.searchProducts(key);
     }
 
-    @Autowired
-    public void setRepo(ProductRepo repo) {
-        this.repo = repo;
-    }
+
 }
