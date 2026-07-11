@@ -12,6 +12,7 @@ import com.example.springecom.model.dto.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
 import com.example.springecom.repo.UserRepo;
+import jakarta.transaction.Transactional;
 import org.hibernate.service.UnknownServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class OrderService {
 
     @Autowired
