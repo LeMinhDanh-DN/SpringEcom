@@ -32,6 +32,7 @@ public class UserService {
         user.setEmail(request.email());
         user.setPassword(encoder.encode(request.password()));
         user.setName(request.name());
+        user.setRole("ROLE_USER");
         return repo.save(user);
     }
 

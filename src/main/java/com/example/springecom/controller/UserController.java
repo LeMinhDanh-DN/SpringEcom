@@ -38,7 +38,8 @@ public class UserController {
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getName());
+                savedUser.getName(),
+                savedUser.getRole());
         return new ResponseEntity<>(new AuthResponse(token, userResponse), HttpStatus.CREATED);
     }
 
@@ -56,7 +57,8 @@ public class UserController {
                     user.getId(),
                     user.getUsername(),
                     user.getEmail(),
-                    user.getName()
+                    user.getName(),
+                    user.getRole()
                     );
 
             return ResponseEntity.ok(new AuthResponse(token, userResponse));
@@ -77,9 +79,11 @@ public class UserController {
         }
         UserResponse userResponse = new UserResponse(
                 user.getId(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getName(),
-                null);
+                user.getRole()
+                );
         return ResponseEntity.ok(userResponse);
     }
 }
