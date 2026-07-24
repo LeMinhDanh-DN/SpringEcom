@@ -9,18 +9,16 @@ import com.example.springecom.service.JwtService;
 import com.example.springecom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:3000" })
 @RequestMapping("/api/auth")
 public class UserController {
     @Autowired
@@ -58,8 +56,7 @@ public class UserController {
                     user.getUsername(),
                     user.getEmail(),
                     user.getName(),
-                    user.getRole()
-                    );
+                    user.getRole());
 
             return ResponseEntity.ok(new AuthResponse(token, userResponse));
         }
@@ -67,7 +64,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @GetMapping("me")
+    @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
 
         if (userDetails == null) {
@@ -82,8 +79,7 @@ public class UserController {
                 user.getUsername(),
                 user.getEmail(),
                 user.getName(),
-                user.getRole()
-                );
+                user.getRole());
         return ResponseEntity.ok(userResponse);
     }
 }
