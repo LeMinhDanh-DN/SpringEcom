@@ -1,19 +1,17 @@
 package com.example.springecom.service;
 
 import com.example.springecom.exception.ProductNotFoundException;
-import com.example.springecom.exception.UserNotFoundException;
 import com.example.springecom.model.Order;
 import com.example.springecom.model.OrderItem;
 import com.example.springecom.model.Product;
 import com.example.springecom.model.User;
-import com.example.springecom.model.dto.OrderItemResponse;
-import com.example.springecom.model.dto.OrderRequest;
-import com.example.springecom.model.dto.OrderResponse;
+import com.example.springecom.model.dto.order.OrderItemResponse;
+import com.example.springecom.model.dto.order.OrderRequest;
+import com.example.springecom.model.dto.order.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
 import com.example.springecom.repo.UserRepo;
 import jakarta.transaction.Transactional;
-import org.hibernate.service.UnknownServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

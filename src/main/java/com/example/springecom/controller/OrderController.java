@@ -1,7 +1,7 @@
 package com.example.springecom.controller;
 
-import com.example.springecom.model.dto.OrderRequest;
-import com.example.springecom.model.dto.OrderResponse;
+import com.example.springecom.model.dto.order.OrderRequest;
+import com.example.springecom.model.dto.order.OrderResponse;
 import com.example.springecom.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

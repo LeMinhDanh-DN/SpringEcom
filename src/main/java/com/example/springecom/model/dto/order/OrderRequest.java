@@ -1,4 +1,4 @@
-package com.example.springecom.model.dto;
+package com.example.springecom.model.dto.order;
 
 import java.util.List;
 

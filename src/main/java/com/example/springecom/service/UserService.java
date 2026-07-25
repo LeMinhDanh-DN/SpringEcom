@@ -2,7 +2,7 @@ package com.example.springecom.service;
 
 import com.example.springecom.exception.UserNotFoundException;
 import com.example.springecom.model.User;
-import com.example.springecom.model.dto.RegisterRequest;
+import com.example.springecom.model.dto.auth.RegisterRequest;
 import com.example.springecom.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

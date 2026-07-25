@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import com.example.springecom.exception.UserNotFoundException;
-
 @Entity
 @Data
 @Table(name = "users")

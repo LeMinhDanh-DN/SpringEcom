@@ -1,4 +1,4 @@
-package com.example.springecom.model.dto;
+package com.example.springecom.model.dto.auth;
 
 public record RegisterRequest(
         String email,

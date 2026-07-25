@@ -1,10 +1,10 @@
 package com.example.springecom.controller;
 
 import com.example.springecom.model.User;
-import com.example.springecom.model.dto.AuthRequest;
-import com.example.springecom.model.dto.AuthResponse;
-import com.example.springecom.model.dto.RegisterRequest;
-import com.example.springecom.model.dto.UserResponse;
+import com.example.springecom.model.dto.auth.AuthRequest;
+import com.example.springecom.model.dto.auth.AuthResponse;
+import com.example.springecom.model.dto.auth.RegisterRequest;
+import com.example.springecom.model.dto.auth.UserResponse;
 import com.example.springecom.service.JwtService;
 import com.example.springecom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
