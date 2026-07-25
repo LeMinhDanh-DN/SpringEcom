@@ -22,7 +22,7 @@ public class OrderItem {
     @ManyToOne
     private Product product;
 
-    int quantity;
+    private int quantity;
     private BigDecimal totalPrice;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -17,11 +17,14 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     @Column(unique = true)
     private String orderId;
     private String customerName;
     private String email;
+    private String number;
+    private String shippingAddress;
+    private String payMethod;
     private String status;
     private LocalDate orderDate;
 
@@ -31,6 +34,6 @@ public class Order {
 
     //cascade
     //khi cap nhat order thi toan bo item cung cap nhat
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    List<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items;
 }

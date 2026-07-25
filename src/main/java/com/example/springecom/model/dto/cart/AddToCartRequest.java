@@ -1,7 +1,9 @@
 package com.example.springecom.model.dto.cart;
 
+import org.jetbrains.annotations.NotNull;
+
 public record AddToCartRequest(
-        int productId,
-        int quantity
-) {
+                @NotNull int productId,
+                @NotNull int quantity) {
+
 }

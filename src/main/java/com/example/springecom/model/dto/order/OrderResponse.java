@@ -12,6 +12,9 @@ public record OrderResponse(
         String email,
         String status,
         LocalDate orderDate,
+        String number,
+        String shippingAddress,
+        String payMethod,
         List<OrderItemResponse> items
 ){
 }

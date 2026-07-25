@@ -1,10 +1,13 @@
 package com.example.springecom.model.dto.order;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public record OrderRequest(
-        String customerName,
-        String email,
-        List<OrderItemResquest> items
-) {
+                @NotNull String customerName,
+                @NotNull String email,
+                @NotNull String number,
+                @NotNull String shippingAddress,
+                @NotNull String payMethod,
+                String voucherCode,
+                String note) {
 }
