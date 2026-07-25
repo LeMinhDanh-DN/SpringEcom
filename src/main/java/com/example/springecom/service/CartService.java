@@ -53,26 +53,42 @@ public class CartService {
     }
 
     public CartResponse addToCart(AddToCartRequest request, UserDetails userDetails) {
+        if (request.quantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = getOrCreateCart(user);
 
         Product product = productRepo.findById(request.productId())
                 .orElseThrow(() -> new ProductNotFoundException("Cannot find product with id " + request.productId()));
 
+        // this product already exist in cart or not
         Optional<CartItem> existingCartItem = cartItemRepo.findByCartAndProduct(cart, product);
+        int newQuantity = request.quantity();
+        if (existingCartItem.isPresent()) {
+            newQuantity += existingCartItem.get().getQuantity();
+        }
+
+        // Check stock
+        if (product.getStockQuantity() < newQuantity) {
+            throw new IllegalArgumentException("Insufficient stock for product " + product.getName() + ". Available: "
+                    + product.getStockQuantity());
+        }
 
         if (existingCartItem.isPresent()) {
             CartItem item = existingCartItem.get();
-            int newQuantity = item.getQuantity() + request.quantity();
             item.setQuantity(newQuantity);
             item.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(newQuantity)));
             cartItemRepo.save(item);
-        } else {
+        }
+
+        else {
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
-            newItem.setQuantity(request.quantity());
-            newItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(request.quantity())));
+            newItem.setQuantity(newQuantity);
+            newItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(newQuantity)));
             cart.getCartItems().add(newItem);
             cartItemRepo.save(newItem);
         }
@@ -94,7 +110,13 @@ public class CartService {
         if (request.quantity() <= 0) {
             cart.getCartItems().remove(item);
             cartItemRepo.delete(item);
-        } else {
+        }
+
+        else {
+            if (item.getProduct().getStockQuantity() < request.quantity()) {
+                throw new IllegalArgumentException("Insufficient stock for product " + item.getProduct().getName()
+                        + ". Available: " + item.getProduct().getStockQuantity());
+            }
             item.setQuantity(request.quantity());
             item.setTotalPrice(item.getProduct().getPrice().multiply(BigDecimal.valueOf(request.quantity())));
             cartItemRepo.save(item);
@@ -155,5 +177,9 @@ public class CartService {
                 .items(itemResponses)
                 .totalCartPrice(totalCartPrice)
                 .build();
+    }
+
+    public Cart findUserCart(User user) {
+        return getOrCreateCart(user);
     }
 }

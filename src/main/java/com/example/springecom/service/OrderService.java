@@ -1,22 +1,15 @@
 package com.example.springecom.service;
 
-import com.example.springecom.exception.ProductNotFoundException;
-import com.example.springecom.model.Order;
-import com.example.springecom.model.OrderItem;
-import com.example.springecom.model.Product;
-import com.example.springecom.model.User;
+import com.example.springecom.model.*;
 import com.example.springecom.model.dto.order.OrderItemResponse;
 import com.example.springecom.model.dto.order.OrderRequest;
 import com.example.springecom.model.dto.order.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
-import com.example.springecom.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,112 +20,101 @@ import java.util.UUID;
 public class OrderService {
 
     @Autowired
-    OrderRepo orderRepo;
+    private OrderRepo orderRepo;
     @Autowired
-    ProductRepo productRepo;
+    private ProductRepo productRepo;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    private UserRepo userRepo;
+    private CartService cartService;
 
     public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
+        User user = userService.findByUserName(userDetails.getUsername());
+        Cart cart = cartService.findUserCart(user);
+        List<CartItem> cartItems = cart.getCartItems();
 
-        String userName = userDetails.getUsername();
-        User user = userService.findByUserName(userName);
-        // Creating order obj for repostory
-        Order order = new Order();
-        String orderId = "ORD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-
-        order.setOrderId(orderId);
-        order.setCustomerName(request.customerName());
-        order.setEmail(request.email());
-        order.setStatus("PLACED");
-        order.setOrderDate(LocalDate.now());
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new IllegalStateException("Your cart is empty.");
+        }
 
         List<OrderItem> orderItems = new ArrayList<>();
+        Order order = new Order();
 
-        request.items().forEach(i -> {
-            Product product = productRepo.findById(i.productId())
-                    .orElseThrow(() -> new ProductNotFoundException("cant find product with id " + i.productId()));
-            product.setStockQuantity(product.getStockQuantity() - i.quantity());
+        for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                throw new IllegalStateException("Product '" + product.getName() + "' is out of stock (remaining: "
+                        + product.getStockQuantity() + ")");
+            }
+
+            int updatedStock = product.getStockQuantity() - cartItem.getQuantity();
+            product.setStockQuantity(updatedStock);
+            if (updatedStock == 0) {
+                product.setProductAvailable(false);
+            }
             productRepo.save(product);
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
-                    .quantity(i.quantity())
-                    .totalPrice(
-                            product.getPrice()
-                                    .multiply(BigDecimal.valueOf(i.quantity())))
+                    .quantity(cartItem.getQuantity())
+                    .totalPrice(cartItem.getTotalPrice())
                     .order(order)
                     .build();
 
             orderItems.add(orderItem);
+        }
 
-        });
-
-        order.setItems(orderItems);
-        // adding order to list of order of current user
-
-//        List<Order> cur_order = user.getOrders();
-//        cur_order.add(order);
-//        user.setOrders(cur_order);
-
-        // already cascade at order so orderItem will be automatically saved
+        order.setOrderId(UUID.randomUUID().toString());
+        order.setCustomerName(request.customerName());
+        order.setEmail(request.email());
+        order.setNumber(request.number());
+        order.setShippingAddress(request.shippingAddress());
+        order.setPayMethod(request.payMethod());
+        order.setStatus("PLACED");
+        order.setOrderDate(LocalDate.now());
         order.setUser(user);
-        // saving order
+        order.setItems(orderItems);
+
         Order savedOrder = orderRepo.save(order);
-//        userRepo.save(user);
 
-        List<OrderItemResponse> orderItemResponse = new ArrayList<>();
-        savedOrder.getItems().forEach(orderItem -> {
-            OrderItemResponse orderResponse = OrderItemResponse.builder()
-                    .productName(orderItem.getProduct().getName())
-                    .quantity(orderItem.getQuantity())
-                    .totalPrice(orderItem.getTotalPrice())
-                    .build();
-            orderItemResponse.add(orderResponse);
-        });
-        OrderResponse orderResponse = new OrderResponse(
-                savedOrder.getOrderId(),
-                savedOrder.getCustomerName(),
-                savedOrder.getEmail(),
-                savedOrder.getStatus(),
-                savedOrder.getOrderDate(),
-                orderItemResponse);
+        cartService.clearCart(userDetails);
 
-        return orderResponse;
+        return mapToOrderResponse(savedOrder);
     }
 
     public List<OrderResponse> getAllOrderResponses(UserDetails userDetails) {
-        String userName = userDetails.getUsername();
-        User user = userService.findByUserName(userName);
+        User user = userService.findByUserName(userDetails.getUsername());
         List<Order> orders = orderRepo.findByUser(user);
 
-        List<OrderResponse> orderResponses = new ArrayList<>();
+        return orders.stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
 
-        for (Order order : orders) {
-            List<OrderItemResponse> orderItemResponses = new ArrayList<>();
+    private OrderResponse mapToOrderResponse(Order order) {
+        List<OrderItemResponse> itemResponses = order.getItems().stream()
+                .map(this::mapToOrderItemResponse)
+                .toList();
 
-            order.getItems().forEach(orderItem -> {
-                ;
-                OrderItemResponse orderItemResponse = OrderItemResponse.builder()
-                        .productName(orderItem.getProduct().getName())
-                        .quantity(orderItem.getQuantity())
-                        .totalPrice(orderItem.getTotalPrice())
-                        .build();
-                orderItemResponses.add(orderItemResponse);
-            });
-            // Convert each Order to OrderResponse
-            OrderResponse orderResponse = new OrderResponse(
-                    order.getOrderId(),
-                    order.getCustomerName(),
-                    order.getEmail(),
-                    order.getStatus(),
-                    order.getOrderDate(),
-                    orderItemResponses);
-            orderResponses.add(orderResponse);
-        }
-        return orderResponses;
+        return OrderResponse.builder()
+                .orderId(order.getOrderId())
+                .customerName(order.getCustomerName())
+                .email(order.getEmail())
+                .status(order.getStatus())
+                .orderDate(order.getOrderDate())
+                .number(order.getNumber())
+                .shippingAddress(order.getShippingAddress())
+                .payMethod(order.getPayMethod())
+                .items(itemResponses)
+                .build();
+    }
+
+    private OrderItemResponse mapToOrderItemResponse(OrderItem orderItem) {
+        return OrderItemResponse.builder()
+                .productName(orderItem.getProduct().getName())
+                .quantity(orderItem.getQuantity())
+                .totalPrice(orderItem.getTotalPrice())
+                .build();
     }
 
 }
