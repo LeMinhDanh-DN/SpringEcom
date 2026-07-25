@@ -3,7 +3,7 @@ package com.example.springecom.controller;
 import com.example.springecom.config.AiSearchTool; // Nhớ import class này
 import com.example.springecom.model.Product;
 import com.example.springecom.service.ProductService;
-import com.example.springecom.service.ProductVectorService;
+import com.example.springecom.service.AI.ProductVectorService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;

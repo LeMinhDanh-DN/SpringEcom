@@ -1,4 +1,4 @@
-package com.example.springecom.service;
+package com.example.springecom.service.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

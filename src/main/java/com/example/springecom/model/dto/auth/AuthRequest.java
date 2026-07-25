@@ -1,6 +1,8 @@
 package com.example.springecom.model.dto.auth;
+
+import org.jetbrains.annotations.NotNull;
+
 public record AuthRequest(
-        String email,
-        String password
-) {
+                @NotNull String email,
+                @NotNull String password) {
 }

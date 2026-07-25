@@ -1,7 +1,7 @@
 package com.example.springecom.service;
 
 import com.example.springecom.model.Product;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.springecom.service.AI.ProductVectorService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.springecom.repo.ProductRepo;
@@ -17,7 +17,7 @@ public class ProductService {
     private final ProductRepo repo;
     private final ProductVectorService productVectorService;
 
-    public ProductService(ProductRepo repo, ProductVectorService service){
+    public ProductService(ProductRepo repo, ProductVectorService service) {
         this.repo = repo;
         this.productVectorService = service;
     }
@@ -43,7 +43,8 @@ public class ProductService {
     }
 
     public byte[] getImageById(int id) {
-        Product p = repo.findById(id).orElseThrow(() -> new ProductNotFoundException("cant find product with id " + id));
+        Product p = repo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("cant find product with id " + id));
         return p.getImageData();
     }
 
@@ -61,16 +62,15 @@ public class ProductService {
 
     }
 
-    public void deleteProduct(int id){
-        if(!repo.existsById(id)){
+    public void deleteProduct(int id) {
+        if (!repo.existsById(id)) {
             throw new ProductNotFoundException("cant find product with id " + id);
         }
         repo.deleteById(id);
     }
 
-    public List<Product> searchProduct(String key){
+    public List<Product> searchProduct(String key) {
         return repo.searchProducts(key);
     }
-
 
 }

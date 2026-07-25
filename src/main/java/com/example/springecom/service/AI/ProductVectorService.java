@@ -1,4 +1,4 @@
-package com.example.springecom.service;
+package com.example.springecom.service.AI;
 
 import com.example.springecom.mapper.ProductAiMapper;
 import com.example.springecom.model.Product;
@@ -7,7 +7,6 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Service

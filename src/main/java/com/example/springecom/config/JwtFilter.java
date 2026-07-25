@@ -1,7 +1,7 @@
 package com.example.springecom.config;
 
-import com.example.springecom.service.JwtService;
-import com.example.springecom.service.MyUserDetailService;
+import com.example.springecom.service.auth.JwtService;
+import com.example.springecom.service.auth.MyUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

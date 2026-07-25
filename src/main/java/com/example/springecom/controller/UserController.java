@@ -5,7 +5,7 @@ import com.example.springecom.model.dto.auth.AuthRequest;
 import com.example.springecom.model.dto.auth.AuthResponse;
 import com.example.springecom.model.dto.auth.RegisterRequest;
 import com.example.springecom.model.dto.auth.UserResponse;
-import com.example.springecom.service.JwtService;
+import com.example.springecom.service.auth.JwtService;
 import com.example.springecom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
