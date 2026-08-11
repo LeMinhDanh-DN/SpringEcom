@@ -12,7 +12,7 @@ import com.example.springecom.model.dto.cart.UpdateCartItemRequest;
 import com.example.springecom.repo.CartItemRepo;
 import com.example.springecom.repo.CartRepo;
 import com.example.springecom.repo.ProductRepo;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CartService {
 
     @Autowired
@@ -38,6 +37,7 @@ public class CartService {
     @Autowired
     private UserService userService;
 
+    @Transactional
     public Cart getOrCreateCart(User user) {
         return cartRepo.findByUser(user).orElseGet(() -> {
             Cart newCart = new Cart();
@@ -46,12 +46,14 @@ public class CartService {
         });
     }
 
+    @Transactional
     public CartResponse getCartResponse(UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = getOrCreateCart(user);
         return mapToCartResponse(cart);
     }
 
+    @Transactional
     public CartResponse addToCart(AddToCartRequest request, UserDetails userDetails) {
         if (request.quantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero");
@@ -96,6 +98,7 @@ public class CartService {
         return mapToCartResponse(cartRepo.save(cart));
     }
 
+    @Transactional
     public CartResponse updateCartItemQuantity(Long itemId, UpdateCartItemRequest request, UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = getOrCreateCart(user);
@@ -125,6 +128,7 @@ public class CartService {
         return mapToCartResponse(cartRepo.save(cart));
     }
 
+    @Transactional
     public CartResponse removeFromCart(Long itemId, UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = getOrCreateCart(user);
@@ -140,6 +144,7 @@ public class CartService {
         return mapToCartResponse(cartRepo.save(cart));
     }
 
+    @Transactional
     public CartResponse clearCart(UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = getOrCreateCart(user);
@@ -179,6 +184,7 @@ public class CartService {
                 .build();
     }
 
+    @Transactional
     public Cart findUserCart(User user) {
         return getOrCreateCart(user);
     }

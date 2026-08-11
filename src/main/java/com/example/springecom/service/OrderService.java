@@ -6,7 +6,7 @@ import com.example.springecom.model.dto.order.OrderRequest;
 import com.example.springecom.model.dto.order.OrderResponse;
 import com.example.springecom.repo.OrderRepo;
 import com.example.springecom.repo.ProductRepo;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class OrderService {
 
     @Autowired
@@ -28,6 +27,7 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
+    @Transactional
     public OrderResponse placeOrder(OrderRequest request, UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Cart cart = cartService.findUserCart(user);
@@ -42,17 +42,10 @@ public class OrderService {
 
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
-            if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new IllegalStateException("Product '" + product.getName() + "' is out of stock (remaining: "
-                        + product.getStockQuantity() + ")");
+            int rowsUpdated = productRepo.decreaseStock(product.getId(), cartItem.getQuantity());
+            if (rowsUpdated == 0) {
+                throw new IllegalStateException("Product '" + product.getName() + "' is out of stock or insufficient quantity.");
             }
-
-            int updatedStock = product.getStockQuantity() - cartItem.getQuantity();
-            product.setStockQuantity(updatedStock);
-            if (updatedStock == 0) {
-                product.setProductAvailable(false);
-            }
-            productRepo.save(product);
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
@@ -82,6 +75,7 @@ public class OrderService {
         return mapToOrderResponse(savedOrder);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrderResponses(UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         List<Order> orders = orderRepo.findByUser(user);

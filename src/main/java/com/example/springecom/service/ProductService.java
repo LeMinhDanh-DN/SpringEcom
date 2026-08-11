@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
-@Transactional
 public class ProductService {
 
     private final ProductRepo repo;
@@ -22,10 +21,12 @@ public class ProductService {
         this.productVectorService = service;
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return repo.findAll();
     }
 
+    @Transactional
     public Product setProduct(Product p, MultipartFile image) throws IOException {
         p.setImageName(image.getOriginalFilename());
         p.setImageType(image.getContentType());
@@ -38,16 +39,19 @@ public class ProductService {
         return savedProduct;
     }
 
+    @Transactional(readOnly = true)
     public Product getProductById(int id) {
         return repo.findById(id).orElseThrow(() -> new ProductNotFoundException("cant find product with id " + id));
     }
 
+    @Transactional(readOnly = true)
     public byte[] getImageById(int id) {
         Product p = repo.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("cant find product with id " + id));
         return p.getImageData();
     }
 
+    @Transactional
     public Product updateProduct(int id, Product p, MultipartFile img) {
         try {
             p.setId(id);
@@ -62,6 +66,7 @@ public class ProductService {
 
     }
 
+    @Transactional
     public void deleteProduct(int id) {
         if (!repo.existsById(id)) {
             throw new ProductNotFoundException("cant find product with id " + id);
@@ -69,6 +74,7 @@ public class ProductService {
         repo.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Product> searchProduct(String key) {
         return repo.searchProducts(key);
     }
