@@ -172,6 +172,7 @@ public class CartService {
                     .totalPrice(itemTotalPrice)
                     .imageName(product.getImageName())
                     .imageType(product.getImageType())
+                    .imageUrl(product.getImageUrl())
                     .build();
 
             itemResponses.add(itemResponse);

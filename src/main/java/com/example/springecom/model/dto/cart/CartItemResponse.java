@@ -14,6 +14,7 @@ public record CartItemResponse(
         int quantity,
         BigDecimal totalPrice,
         String imageName,
-        String imageType
+        String imageType,
+        String imageUrl
 ) {
 }

@@ -46,16 +46,16 @@ public class ProductController {
         return new ResponseEntity<>(p, HttpStatus.OK);
     }
 
-    // get product image
+    // get product image (redirect to Cloudinary URL)
     @GetMapping("product/{id}/image")
-    public ResponseEntity<byte[]> getImageByProductId(@PathVariable int id) {
-
-        Product p = service.getProductById(id);
-        byte[] image = service.getImageById(id);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(p.getImageType() != null ? p.getImageType() : "image/jpeg"))
-                .body(image);
+    public ResponseEntity<Void> getImageByProductId(@PathVariable int id) {
+        String imageUrl = service.getImageUrlById(id);
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(java.net.URI.create(imageUrl))
+                    .build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // update
